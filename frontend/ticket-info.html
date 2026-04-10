@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Information - ResolviaAI</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        /* Spinning loader */
+        .ai-spinner {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 4px solid #e5e7eb;
+            border-top-color: #4f46e5;
+            animation: aiSpin 0.9s linear infinite;
+            flex-shrink: 0;
+        }
+        @keyframes aiSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        .ai-analysis-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #4f46e5;
+            border-radius: 12px;
+            padding: 1.75rem 2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+        }
+
+        .ai-analysis-content h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-analysis-content p {
+            color: #475569;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .ai-analysis-content .ai-detail-list {
+            margin-top: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .ai-analysis-content .ai-detail-list span {
+            font-size: 0.85rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-analysis-content .ai-detail-list span::before {
+            content: "•";
+            color: #4f46e5;
+            font-weight: 700;
+        }
+
+        .pulse-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4f46e5;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+            margin-right: 0.4rem;
+            vertical-align: middle;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.75); }
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="user-main-wrapper">
+        <nav class="dashboard-nav">
+            <span class="nav-page-title">Ticket Information</span>
+            <div class="nav-right">
+                <div class="user-profile" title="My Profile">
+                    <div class="avatar" id="userAvatar">U</div>
+                    <div class="user-info">
+                        <span class="user-name"  id="userNameText">User</span>
+                        <span class="user-email" id="userEmailText">user@email.com</span>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="handleLogout()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <main class="dashboard-main form-page-main">
+            <a href="dashboard.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to Dashboard
+            </a>
+
+            <header class="page-header">
+                <h1>Ticket Information</h1>
+                <p>Your ticket has been submitted. This page refreshes automatically every 5 seconds.</p>
+            </header>
+
+            <section class="card ticket-details-card">
+
+                <!-- Status Timeline (rendered by JS) -->
+                <div id="statusTimeline"></div>
+
+                <!-- Ticket Meta -->
+                <div class="ticket-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Ticket Number</span>
+                        <span class="meta-value" id="view-ticket-id">Loading...</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Date</span>
+                        <span class="meta-value" id="view-ticket-date">--/--/----</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Category</span>
+                        <span class="meta-value" id="view-ticket-category">—</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Status</span>
+                        <span class="badge badge-inprocess">In Progress</span>
+                    </div>
+                </div>
+
+                <!-- Ticket Title & Description -->
+                <div class="ticket-content block-divider">
+                    <h3 id="view-ticket-title" class="ticket-title-large">Loading...</h3>
+                    <p  id="view-ticket-desc"  class="ticket-desc-text">Loading description...</p>
+                </div>
+
+                <!-- AI Analysis In Progress Box -->
+                <div class="ai-analysis-box">
+                    <div class="ai-spinner"></div>
+                    <div class="ai-analysis-content">
+                        <h4><span class="pulse-dot"></span>AI Analysis In Progress</h4>
+                        <p>Your ticket has been received and is currently being analyzed by our AI system.
+                           A support agent will review the findings and respond to your issue shortly.</p>
+                        <div class="ai-detail-list">
+                            <span>Ticket queued for AI classification and priority assignment</span>
+                            <span>Support team will be notified automatically</span>
+                            <span>Average response time: within 1 business day</span>
+                            <span>This page auto-refreshes every 5 seconds</span>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <script src="common.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>
